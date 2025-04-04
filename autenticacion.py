@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 import httpx
 import os
 from dotenv import load_dotenv
+from jose import jwt
 
 load_dotenv()
 
@@ -10,10 +11,14 @@ app = FastAPI()
 
 CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI")  # Debe ser https://<TU_BACKEND>.onrender.com/auth/callback
+REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
+
+@app.get("/")
+def home():
+    return {"message": "FastAPI Backend funcionando."}
 
 @app.get("/auth/google")
 def login_with_google():
@@ -53,10 +58,12 @@ async def callback(request: Request):
     id_token = tokens.get("id_token")
     access_token = tokens.get("access_token")
 
-    # Redirigir a la app Expo con los tokens
+    # Decodificar el ID token y extraer el UID
+    decoded = jwt.get_unverified_claims(id_token)
+    uid = decoded.get("sub")
+    
     redirect_to_app = (
-        f"exp://exp.host/@andrewoliverbatta/AppEstudio"
-        f"?access_token={access_token}&id_token={id_token}"
+    f"exp://exp.host/@andrewoliverbatta/AppEstudio"
+    f"?access_token={access_token}&id_token={id_token}&uid={uid}"
     )
-
     return RedirectResponse(redirect_to_app)
