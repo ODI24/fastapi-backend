@@ -53,7 +53,6 @@ async def callback(request: Request):
     id_token = tokens.get("id_token")
     access_token = tokens.get("access_token")
 
-    # Redirigir a la app Expo con los tokens
     redirect_to_app = (
         f"exp://exp.host/@andrewoliverbatta/AppEstudio"
         f"?access_token={access_token}&id_token={id_token}"
