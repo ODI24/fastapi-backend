@@ -63,7 +63,7 @@ async def callback(request: Request):
     uid = decoded.get("sub")
     
     redirect_to_app = (
-    f"exp://exp.host/@andrewoliverbatta/AppEstudio"
-    f"?access_token={access_token}&id_token={id_token}&uid={uid}"
+     f"https://auth.expo.io/@andrewoliverbatta/AppEstudio"
+     f"?access_token={access_token}&id_token={id_token}&uid={uid}"
     )
     return RedirectResponse(redirect_to_app)
