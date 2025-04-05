@@ -10,12 +10,11 @@ app = FastAPI()
 
 CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI")
+REDIRECT_URI = os.getenv("REDIRECT_URI")  # Debe ser EXACTAMENTE igual al de Google Console
 
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 
-# 🔁 Este endpoint inicia el login
 @app.get("/auth/google")
 def login_with_google():
     redirect = (
@@ -25,11 +24,11 @@ def login_with_google():
         f"&response_type=code"
         f"&scope=openid%20email%20profile"
         f"&access_type=offline"
+        f"&prompt=select_account"
     )
     return RedirectResponse(redirect)
 
 
-# ⬅️ Google redirige aquí después del login
 @app.get("/auth/callback")
 async def callback(request: Request):
     code = request.query_params.get("code")
@@ -54,12 +53,12 @@ async def callback(request: Request):
         return {"error": "Error al intercambiar el código", "details": response.text}
 
     tokens = response.json()
-    print("TOKENS:", tokens)  # para debug
+    print("TOKENS:", tokens)
 
     id_token = tokens.get("id_token")
     access_token = tokens.get("access_token")
 
-    # Redirección directa a tu app instalada (build)
+    # 🔁 Redirige a la app instalada con los tokens
     redirect_to_app = f"quizforge://redirect?id_token={id_token}&access_token={access_token}"
 
     return RedirectResponse(redirect_to_app)
